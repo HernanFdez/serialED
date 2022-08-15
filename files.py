@@ -14,11 +14,11 @@ import hyperspy.api as hs
 
 
 
-def gettilt(path, tilt=''):
+def gettilt(path, tilt='', lazy=True):
     if tilt!='':
         tilt = '_'+str(tilt)
     file = path + tilt + '.hspy'
-    sig = hs.load(os.path.join(file))
+    sig = hs.load(os.path.join(file), lazy=lazy)
     return sig
 
 

@@ -20,36 +20,22 @@ import plotting
 
 
 
-
-
-
-
-def getpeaks_pixstem(dataarray):
-    ps_obj = ps.PixelatedSTEM(dataarray)
-    template = ps_obj.template_match_disk(disk_r=20, show_progressbar=True)
-    peak_array = template.find_peaks(show_progressbar=True)
-    pks = peak_array.compute().reshape(1)[0]
-    return pks
-
-
-
 def getpeaks(dataarray, s=8, refining=True):
-    alpha=1.4
-    p0ratio=0.01
-    bgratio=1.5
-    BGfrac=.25
+    alpha = 1.4
+    p0ratio = 0.0
+    BG_coef = 1.0
     dim = len(dataarray)
     
     kern, kerf = createmasks(s)
     An, Af = np.sum(kern), np.sum(kerf)
     kern, kerf = kern/An, kerf/(Af/alpha)
     
-    mapn = signal.correlate2d(dataarray, kern, "valid")
-    mapf = signal.correlate2d(dataarray, kerf, "valid")
+    mapn = utils.correlate2d(dataarray, kern, "valid")
+    mapf = utils.correlate2d(dataarray, kerf, "valid")
     
-    BG = np.max(np.sort(dataarray.reshape(dim**2))[:round(BGfrac* dim**2)])
+    BG = BG_coef*np.average(dataarray)
     MAX = np.max(mapn)
-    TH = max(0*BG, p0ratio*MAX)
+    TH = max(BG, p0ratio*MAX)
     
     pks=[]
     for x in range(dim-2*s):
@@ -113,7 +99,12 @@ def show_ED(shot, s=8, refining=True):
     plt.plot(x, y, 'ro', marker="o", markersize=2, markeredgecolor="red", markerfacecolor="green")
   
     
-  
+def getpeaks_pixstem(dataarray):
+    ps_obj = ps.PixelatedSTEM(dataarray)
+    template = ps_obj.template_match_disk(disk_r=20, show_progressbar=True)
+    peak_array = template.find_peaks(show_progressbar=True)
+    pks = peak_array.compute().reshape(1)[0]
+    return pks
     
   
     

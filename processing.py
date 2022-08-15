@@ -5,6 +5,7 @@ Created on Sun Aug 14 17:34:18 2022
 @author: HFernandezGarcia
 """
 
+import time
 import math
 import numpy as np
 from numpy.linalg import norm
@@ -20,7 +21,7 @@ import facets
 import matching
 
 
-def showautocorrpeaks(shot_raw, s=8):
+def show_AC_peaks(shot_raw, s=8):
     shot = shot_raw/np.max(shot_raw)
     dim = len(shot)
     ED_peaks = peaks.getpeaks(shot, s)
@@ -46,8 +47,10 @@ def showautocorrpeaks(shot_raw, s=8):
     if len(base)<2:
         return
     
+    print(base[0])
+    print(base[1])
     print([norm(base[0]), norm(base[1]), utils.VectorAngle(base[0], base[1])])
-    for v in base[:1]:
+    for v in base:
         plt.arrow(center[0], center[1], v[0], v[1], head_width=head, head_length=head, length_includes_head=True, color='black')
     
     plt.axline(center, slope=-base[0,0]/base[0,1], color="blue", linestyle=(5, (3, 6)))
@@ -64,7 +67,10 @@ def process_shots(shots, Set, s=8):
     angles_all = []
     facets_all = []
     
-    for i in range(len(shots)):
+    progress = 0.0
+    num_shots = len(shots)
+    t0 = time.time()
+    for i in range(num_shots):
         shot = shots[i]
         ED_peaks = peaks.getpeaks(shot, s)
         if len(ED_peaks)<5:
@@ -82,13 +88,19 @@ def process_shots(shots, Set, s=8):
             continue
         angle = 0 if basis[0,0]==0 else np.arctan(basis[0,1]/basis[0,0])
         facet = facets.base2facet(basis)
-        print(i/len(shots), facet)
+        # print(i/num_shots, facet)
+        current_progress = (1000*i//num_shots)/10
+        if current_progress>progress:
+            progress = current_progress
+            print(str(progress) + ' % processed')
         
         peaks_all.append(AC_peaks.flatten())
         basis_all.append(basis.flatten())
         angles_all.append(angle)
         facets_all.append(facet)
     
+    dt = time.time() - t0
+    print('\nprocessed ' + str(num_shots) + ' patterns in ' + str(dt) + ' seconds: ' + str(dt/num_shots) + ' s/pattern')
     max_peaks = max([len(pks) for pks in peaks_all])
     peaks_all = [np.pad(pks, (0,max_peaks-len(pks))) for pks in peaks_all]
     
@@ -112,7 +124,7 @@ def rand_failure(Set):
     idx=failures[np.random.randint(num_fails)]
     x, y = idx//size, idx%size
     print("showing failure: ("+str(x)+","+str(y)+")")
-    return (y, x)
+    return (x, y)
     
     
     

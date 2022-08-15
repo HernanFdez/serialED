@@ -11,6 +11,9 @@ from scipy import signal
 from numpy.linalg import norm
 
 
+def correlate2d(arr1, arr2, mode = 'valid'):
+    return signal.fftconvolve(arr1, arr2[::-1, ::-1], mode = mode)
+
 
 def autocorrelate(arr):
     return signal.fftconvolve(arr, arr[::-1, ::-1], mode='same')

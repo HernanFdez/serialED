@@ -35,6 +35,14 @@ def show_orientation(angles, failures):
     
     for f in failures:
         angles = np.insert(angles, f, np.inf)
-    angles = angles.reshape((size,)*2)
+    angles = angles.reshape((size,)*2)    
     angles = np.ma.masked_where(angles == np.inf, angles)
+    angles = angles.transpose()
     plotting.ArrayPlot(angles, colors='hsv')
+    
+    
+    
+    
+    
+    
+    

@@ -25,6 +25,6 @@ def ArrayPlot(data, colors='viridis'):
     
     
 def Plot4D(path, tilt=''):
-    files.gettilt(path, tilt).plot()
+    files.gettilt(path, tilt, lazy=False).plot()
     
     
